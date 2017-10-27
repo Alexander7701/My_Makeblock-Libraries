@@ -15,10 +15,10 @@ MeLightSensorRGB LightSensorRGB;
 uint8_t keyPressed = KEY_NULL;
 uint8_t keyPressedPrevious = KEY_NULL;
 int16_t turnoffset = 0;
-uint8_t sensorstate[4];
+uint8_t sensorstate;
 int16_t set_speed = 0;
 uint8_t run_flag = 0;
-uint8_t study_flag = 0;
+uint8_t study_flag1 = 0;
 unsigned long motor_ctrl_time = 0;
 unsigned long printf_time = 0;
 
@@ -74,13 +74,20 @@ void setup(){
     attachInterrupt(Encoder_4.getIntNum(), isr_process_encoder4, RISING);
 
 		LightSensorRGB.begin();
-		LightSensorRGB.setKp(0.18);
+		LightSensorRGB.setKp(0.15);
     Serial.begin(115200);
+
+    Serial.println("init ok...");
+    
 }
 
 void loop()
 {
-	
+		
+	Encoder_3.loop();
+	Encoder_4.loop();
+ 	LightSensorRGB.loop();
+
   keyPressedPrevious = keyPressed;
   keyPressed = btn.pressed();
   if (keyPressedPrevious != keyPressed)
@@ -101,48 +108,43 @@ void loop()
     }
   }
 	
-	  if(millis() - motor_ctrl_time > 10)  
-	  { 
-	   	study_flag = LightSensorRGB.getStudyFlag();
-	  		
-	  	if((run_flag == 1) && (study_flag == 0))
-			{
-			  motor_ctrl_time = millis(); 
-				LightSensorRGB.getPositionState(sensorstate, 4);
-				turnoffset = LightSensorRGB.getPositionOffset();
-			  if(set_speed < 100)
-			  {
-					set_speed++;
-			  }
-				Encoder_3.setTarPWM(set_speed + turnoffset);
-	    	Encoder_4.setTarPWM(-(set_speed - turnoffset));
-			}
-		  else
+  if(millis() - motor_ctrl_time > 10)  
+  { 
+		study_flag1 = LightSensorRGB.getStudyFlag();
+		sensorstate = LightSensorRGB.getPositionState();
+		turnoffset = LightSensorRGB.getPositionOffset();
+  		
+  	if((run_flag == 1) && (study_flag1 == 0))
+		{
+		  motor_ctrl_time = millis(); 
+		  if(set_speed < 100)
 		  {
-		  	turnoffset = 0;
-		  	set_speed = 0;
-		  	run_flag = 0;
-		 		Encoder_3.setTarPWM(0);
-		    Encoder_4.setTarPWM(-0);
+				set_speed++;
 		  }
+			Encoder_3.setTarPWM(set_speed + turnoffset);
+    	Encoder_4.setTarPWM(-(set_speed - turnoffset));	
+		}
+	  else
+	  {
+	  	turnoffset = 0;
+	  	set_speed = 0;
+	  	run_flag = 0;
+	 		Encoder_3.setTarPWM(0);
+	    Encoder_4.setTarPWM(-0);
+	  }
   }
 
   if(millis() - printf_time > 500)  
   {    
 	  printf_time = millis();  
-	  Serial.print(sensorstate[0]);
+	  Serial.print(study_flag1);
 	  Serial.print(", ");
-	  Serial.print(sensorstate[1]);
+	  Serial.print(run_flag);
 	  Serial.print(", ");
-	  Serial.print(sensorstate[2]);
-	  Serial.print(", ");
-	  Serial.print(sensorstate[3]);
+	  Serial.print(sensorstate);
 	  Serial.print(", ");
  		Serial.println(turnoffset);
   }
-    
-	Encoder_3.loop();
-	Encoder_4.loop();
-}
 
+}
 

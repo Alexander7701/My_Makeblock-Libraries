@@ -68,13 +68,10 @@
 #define LIGHTSENSOR_RGB_DATA_S2        (0x01)
 #define LIGHTSENSOR_RGB_DATA_S3        (0x02)
 #define LIGHTSENSOR_RGB_DATA_S4        (0x03)
-#define LIGHTSENSOR_RGB_STATE_S1       (0x04)
-#define LIGHTSENSOR_RGB_STATE_S2       (0x05)
-#define LIGHTSENSOR_RGB_STATE_S3       (0x06)
-#define LIGHTSENSOR_RGB_STATE_S4       (0x07)
-#define LIGHTSENSOR_RGB_TURNOFFSET_L   (0x08)
-#define LIGHTSENSOR_RGB_TURNOFFSET_H   (0x09)
-#define LIGHTSENSOR_RGB_STUDY_FLAG     (0x0A)
+#define LIGHTSENSOR_RGB_TURNOFFSET_L   (0x04)
+#define LIGHTSENSOR_RGB_TURNOFFSET_H   (0x05)
+#define LIGHTSENSOR_RGB_STATE       	 (0x06)
+#define LIGHTSENSOR_RGB_STUDY_FLAG     (0x07)
 
 
 //LightSensorRGB number
@@ -326,7 +323,7 @@ public:
      |     |      |      |      |
      |--------------------------|
  */
-	void getPositionState(uint8_t *statebuff, uint8_t num);
+	uint8_t getPositionState(void);
 	
 /**
  * \par Function
@@ -341,7 +338,24 @@ public:
  *   
  * \par Others
  */
-bool getStudyFlag(void);
+	uint8_t getStudyFlag(void);
+
+/**
+ * \par Function
+ *   updataAllSensorValue
+ * \par Description
+ *   updata All Sensor Value.
+ * \param[in]
+ *   None
+ * \par Output
+ *   None
+ * \return
+ *   
+ * \par Others
+ */
+	void updataAllSensorValue(void);
+
+	void loop(void);
 
 private:
   volatile uint8_t  _AD0;
@@ -350,7 +364,9 @@ private:
   uint8_t adcOutput[LIGHTSENSOR_RGB_NUM];
   uint8_t Device_Address;
   float Kp;
-  bool study_flag;
+  int16_t positionOffset;
+  uint8_t positionState;
+  uint8_t study_flag;
   
 /**
  * \par Function

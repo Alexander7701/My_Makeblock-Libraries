@@ -379,20 +379,7 @@ void MeLightSensorRGB::setKp(float value)
  */
 int16_t MeLightSensorRGB::getPositionOffset(void)
 {
-  int8_t return_value;
-  int16_t outvalue;
-  static int16_t pre_outvalue;
-
-  /* read data */
-  return_value = readData(LIGHTSENSOR_RGB_TURNOFFSET_L, &i2cData[8], 2);
-  if(return_value == I2C_OK)
-  {
-    pre_outvalue = (int16_t)(i2cData[8] | ((uint16_t)i2cData[9]<<8));
-  }
-
-  outvalue = (int16_t)(Kp * pre_outvalue);
-  outvalue = constrain(outvalue, -512, 512);
-  return outvalue;
+  return positionOffset;
 }
 
 /**
@@ -415,19 +402,9 @@ int16_t MeLightSensorRGB::getPositionOffset(void)
      |     |      |      |      |
      |--------------------------|
  */
-void MeLightSensorRGB::getPositionState(uint8_t *statebuff, uint8_t num)
+uint8_t MeLightSensorRGB::getPositionState(void)
 {
-  int8_t return_value;
-  
-  if(num <= LIGHTSENSOR_RGB_NUM)  
-  {
-    /* read data */
-    return_value = readData(LIGHTSENSOR_RGB_STATE_S1, &i2cData[4], LIGHTSENSOR_RGB_NUM);
-    if(return_value == I2C_OK)
-    {
-      memcpy(statebuff, &i2cData[4], num);
-    }
-  }
+  return positionState;
 }
 
 /**
@@ -443,19 +420,39 @@ void MeLightSensorRGB::getPositionState(uint8_t *statebuff, uint8_t num)
  *   
  * \par Others
  */
-bool MeLightSensorRGB::getStudyFlag(void)
+uint8_t MeLightSensorRGB::getStudyFlag(void)
+{
+  return study_flag;
+}
+
+/**
+ * \par Function
+ *   updataAllSensorValue
+ * \par Description
+ *   updata All Sensor Value.
+ * \param[in]
+ *   None
+ * \par Output
+ *   None
+ * \return
+ *   
+ * \par Others
+ */
+void MeLightSensorRGB::updataAllSensorValue(void)
 {
   int8_t return_value;
-  static uint8_t pre_value = 0;
-
+  int16_t temp_positionOffset;
+  
   /* read data */
-  return_value = readData(LIGHTSENSOR_RGB_STUDY_FLAG, &i2cData[10], 1);
+  return_value = readData(LIGHTSENSOR_RGB_TURNOFFSET_L, &i2cData[4], 3);
   if(return_value == I2C_OK)
   {
-    pre_value = i2cData[10];
+    temp_positionOffset = (int16_t)(i2cData[5] | ((uint16_t)i2cData[6]<<8));
+    temp_positionOffset = (int16_t)(Kp * temp_positionOffset);
+    positionOffset= constrain(temp_positionOffset, -512, 512);
+    positionState = i2cData[4] & 0x0F;
+    study_flag = (i2cData[4]>>7) & 0x01;
   }
-  study_flag = pre_value;
-  return study_flag;
 }
 
 /**
@@ -526,7 +523,8 @@ int8_t MeLightSensorRGB::readData(uint8_t start, uint8_t *buffer, uint8_t size)
   return_value = Wire.endTransmission(false);
   if(return_value != 0)
   {
-    return(return_value);
+    return(I2C_ERROR);
+    //return(return_value);
   }
   delayMicroseconds(1);
   /* Third parameter is true: relase I2C-bus after data is read. */
@@ -580,5 +578,15 @@ int8_t MeLightSensorRGB::writeData(uint8_t start, const uint8_t *pData, uint8_t 
   Wire.write(pData, size);  
   return_value = Wire.endTransmission(true); 
   return(return_value); //return: no error                     
+}
+
+void MeLightSensorRGB::loop(void)
+{
+  static unsigned long updata_time = 0;
+  if(millis() - updata_time > 10)  
+  {    
+	  updata_time = millis();  
+    updataAllSensorValue();
+  }
 }
 
