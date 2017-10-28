@@ -10,7 +10,7 @@ MeEncoderOnBoard Encoder_2(SLOT2);
 MeEncoderOnBoard Encoder_3(SLOT3);
 MeEncoderOnBoard Encoder_4(SLOT4);
 Me4Button btn(PORT_8);
-MeLightSensorRGB LightSensorRGB;
+MeLightSensorRGB LightSensorRGB(PORT_9, 3);
 
 uint8_t keyPressed = KEY_NULL;
 uint8_t keyPressedPrevious = KEY_NULL;
@@ -87,7 +87,8 @@ void loop()
 	Encoder_3.loop();
 	Encoder_4.loop();
  	LightSensorRGB.loop();
-
+	delay(1);
+	
   keyPressedPrevious = keyPressed;
   keyPressed = btn.pressed();
   if (keyPressedPrevious != keyPressed)
@@ -144,6 +145,8 @@ void loop()
 	  Serial.print(sensorstate);
 	  Serial.print(", ");
  		Serial.println(turnoffset);
+
+ 		Serial.println(LightSensorRGB.getDevAddr());
   }
 
 }
