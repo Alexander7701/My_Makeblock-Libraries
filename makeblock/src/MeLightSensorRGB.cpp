@@ -90,7 +90,36 @@ MeLightSensorRGB::MeLightSensorRGB(uint8_t port) : MePort(port)
  */
 MeLightSensorRGB::MeLightSensorRGB(uint8_t port, uint8_t address) : MePort(port)
 {
-  Device_Address = address;
+	Device_Address = LIGHTSENSORRGB_DEFAULT_ADDRESS + address;
+
+  //address0-11, address1-10, address2-01, address3-00
+	pinMode(s1, OUTPUT);
+	pinMode(s2, OUTPUT);
+  if(address == 0)
+  {
+  	digitalWrite(s1,HIGH);
+  	digitalWrite(s2,HIGH);
+	}
+	else if(address == 1)
+  {
+  	digitalWrite(s1,LOW);
+  	digitalWrite(s2,HIGH);
+	}
+	else if(address == 2)
+  {
+  	digitalWrite(s1,HIGH);
+  	digitalWrite(s2,LOW);
+	}
+	else if(address == 3)
+  {
+  	digitalWrite(s1,LOW);
+  	digitalWrite(s2,LOW);
+	}
+	else
+	{ 
+    digitalWrite(s1,HIGH);
+  	digitalWrite(s2,HIGH);
+	}
 }
 #else  // ME_PORT_DEFINED
 /**
@@ -178,7 +207,7 @@ void MeLightSensorRGB::begin(void)
   study_flag = false;
   
   Wire.begin();
-  delay(100);
+  delay(10);
 }
 
 /**
@@ -514,6 +543,7 @@ int8_t MeLightSensorRGB::readData(uint8_t start, uint8_t *buffer, uint8_t size)
 {
   int16_t i = 0;
   int8_t return_value = 0;
+
   Wire.beginTransmission(Device_Address);
   return_value = Wire.write(start);
   if(return_value != 1)
@@ -583,10 +613,11 @@ int8_t MeLightSensorRGB::writeData(uint8_t start, const uint8_t *pData, uint8_t 
 void MeLightSensorRGB::loop(void)
 {
   static unsigned long updata_time = 0;
-  if(millis() - updata_time > 10)  
+  if(millis() - updata_time > 8)  
   {    
 	  updata_time = millis();  
     updataAllSensorValue();
   }
+	delay(1);
 }
 

@@ -61,7 +61,7 @@
 /* Exported macro ------------------------------------------------------------*/
 #define I2C_ERROR                  						(-1)
 #define I2C_OK                    						(0)
-#define LIGHTSENSORRGB_DEFAULT_ADDRESS       (0x1E)
+#define LIGHTSENSORRGB_DEFAULT_ADDRESS       (0x20)
 
 //Me LightSensorRGB Register Address
 #define LIGHTSENSOR_RGB_DATA_S1        (0x00)

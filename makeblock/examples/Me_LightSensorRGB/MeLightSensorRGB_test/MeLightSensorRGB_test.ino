@@ -3,6 +3,8 @@
 #include <SoftwareSerial.h>
 
 #include <MeMegaPiPro.h>
+#include "MeLightSensorRGB.h"
+
 
 
 MeLightSensorRGB LightSensorRGB1(PORT_6,0);
@@ -22,10 +24,10 @@ void setup()
 		LightSensorRGB3.begin();
 		LightSensorRGB4.begin();
 		
-		LightSensorRGB1.setKp(0.18);//4.设置RGB巡线传感器转向灵敏度Kp
-		LightSensorRGB2.setKp(0.18);
-		LightSensorRGB3.setKp(0.18);
-		LightSensorRGB4.setKp(0.18);
+		LightSensorRGB1.setKp(0.1);//4.设置RGB巡线传感器转向灵敏度Kp
+		LightSensorRGB2.setKp(0.1);
+		LightSensorRGB3.setKp(0.1);
+		LightSensorRGB4.setKp(0.1);
 		
     Serial.begin(115200);
 }
@@ -33,13 +35,9 @@ void setup()
 void loop()
 {
 	LightSensorRGB1.loop();
-	delay(1);
 	LightSensorRGB2.loop();
-	delay(1);
 	LightSensorRGB3.loop();
-	delay(1);
 	LightSensorRGB4.loop();
-	delay(1);
 	
 	study_flag1 = LightSensorRGB1.getStudyFlag();//3.获取RGB巡线传感器是否在学习中
 	study_flag2 = LightSensorRGB2.getStudyFlag();

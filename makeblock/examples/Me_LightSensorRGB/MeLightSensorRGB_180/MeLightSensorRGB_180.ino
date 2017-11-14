@@ -87,7 +87,6 @@ void loop()
 	Encoder_3.loop();
 	Encoder_4.loop();
  	LightSensorRGB.loop();
-	delay(1);
 	
   keyPressedPrevious = keyPressed;
   keyPressed = btn.pressed();
