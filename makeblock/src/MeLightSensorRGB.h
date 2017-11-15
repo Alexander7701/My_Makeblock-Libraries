@@ -68,11 +68,9 @@
 #define LIGHTSENSOR_RGB_DATA_S2        (0x01)
 #define LIGHTSENSOR_RGB_DATA_S3        (0x02)
 #define LIGHTSENSOR_RGB_DATA_S4        (0x03)
-#define LIGHTSENSOR_RGB_TURNOFFSET_L   (0x04)
-#define LIGHTSENSOR_RGB_TURNOFFSET_H   (0x05)
-#define LIGHTSENSOR_RGB_STATE       	 (0x06)
-#define LIGHTSENSOR_RGB_STUDY_FLAG     (0x07)
-
+#define LIGHTSENSOR_RGB_STATE       	 (0x04)
+#define LIGHTSENSOR_RGB_TURNOFFSET_L   (0x05)
+#define LIGHTSENSOR_RGB_TURNOFFSET_H   (0x06)
 
 //LightSensorRGB number
 #define LIGHTSENSOR_RGB_NUM		         (0x04)
@@ -256,7 +254,7 @@ public:
  * \par Function
  *   getAllADCValue
  * \par Description
- *   Get the S1¡¢S2¡¢S3¡¢S4 sensor ADC value.
+ *   Get the S1??S2??S3??S4 sensor ADC value.
  * \param[in]
  *   None
  * \par Output
@@ -324,6 +322,20 @@ public:
      |--------------------------|
  */
 	uint8_t getPositionState(void);
+/**
+ * \par Function
+ *   getPositionState
+ * \par Description
+ *   get turn Value.
+ * \param[in]
+ *   Speed:set forward speed
+ * \par Output
+ *   None
+ * \return
+ *   None
+ * \par Others
+ */
+  uint8_t getIicErrorCnt(void);
 	
 /**
  * \par Function
@@ -367,6 +379,7 @@ private:
   int16_t positionOffset;
   uint8_t positionState;
   uint8_t study_flag;
+  uint32_t iic_error_count;
   
 /**
  * \par Function
@@ -448,4 +461,3 @@ private:
   int8_t writeData(uint8_t start, const uint8_t *pData, uint8_t size);
 };
 #endif //  MeLightSensorRGB_H
-

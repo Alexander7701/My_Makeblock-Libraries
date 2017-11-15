@@ -50,7 +50,7 @@
 #include "MeLightSensorRGB.h"
 
   
-//ËÀÇøÏÞÖÆ
+//????????
 #define LIMIT_DEATH(x, a)	if( (((x) > 0) && ((x) < (a))) ) (x) = 0;\
             							else if((x) >= (a)) (x) = (x) - (a);\
             							else if( (((x) <= 0) && ((x) >= -(a))) ) (x) = 0;	\
@@ -203,8 +203,9 @@ void MeLightSensorRGB::begin(void)
   {
 
   }
-  Kp = 0.5;
+  Kp = 0.1;
   study_flag = false;
+  iic_error_count = 0;
   
   Wire.begin();
   delay(10);
@@ -343,7 +344,7 @@ uint8_t MeLightSensorRGB::getADCValueS4(void)
  * \par Function
  *   getAllADCValue
  * \par Description
- *   Get the S1¡¢S2¡¢S3¡¢S4 sensor ADC value.
+ *   Get the S1??S2??S3??S4 sensor ADC value.
  * \param[in]
  *   None
  * \par Output
@@ -383,7 +384,10 @@ void MeLightSensorRGB::getAllADCValue(uint8_t *adcbuff, uint8_t size)
  */
 void MeLightSensorRGB::setKp(float value)
 {
-  Kp = value;
+  if((value >= 0) && (value <= 1))
+  {
+    Kp = value;
+  }
 }
 
 /**
@@ -438,6 +442,24 @@ uint8_t MeLightSensorRGB::getPositionState(void)
 
 /**
  * \par Function
+ *   getPositionState
+ * \par Description
+ *   get turn Value.
+ * \param[in]
+ *   Speed:set forward speed
+ * \par Output
+ *   None
+ * \return
+ *   None
+ * \par Others
+ */
+uint8_t MeLightSensorRGB::getIicErrorCnt(void)
+{
+  return iic_error_count;
+}
+
+/**
+ * \par Function
  *   getStudyFlag
  * \par Description
  *   get turn Value.
@@ -473,14 +495,21 @@ void MeLightSensorRGB::updataAllSensorValue(void)
   int16_t temp_positionOffset;
   
   /* read data */
-  return_value = readData(LIGHTSENSOR_RGB_TURNOFFSET_L, &i2cData[4], 3);
+  return_value = readData(LIGHTSENSOR_RGB_STATE, &i2cData[4], 3);
   if(return_value == I2C_OK)
   {
-    temp_positionOffset = (int16_t)(i2cData[5] | ((uint16_t)i2cData[6]<<8));
-    temp_positionOffset = (int16_t)(Kp * temp_positionOffset);
-    positionOffset= constrain(temp_positionOffset, -512, 512);
-    positionState = i2cData[4] & 0x0F;
-    study_flag = (i2cData[4]>>7) & 0x01;
+    if(i2cData[4] <= 0x1F)
+    {
+      positionState = i2cData[4] & 0x0F;
+      study_flag = (i2cData[4]>>4) & 0x01;
+      temp_positionOffset = (int16_t)(i2cData[5] | ((uint16_t)i2cData[6]<<8));
+      temp_positionOffset = (int16_t)(Kp * temp_positionOffset);
+      positionOffset= constrain(temp_positionOffset, -512, 512);
+    }
+    else
+    {
+      iic_error_count++;  
+    }
   }
 }
 
@@ -620,4 +649,3 @@ void MeLightSensorRGB::loop(void)
   }
 	delay(1);
 }
-
