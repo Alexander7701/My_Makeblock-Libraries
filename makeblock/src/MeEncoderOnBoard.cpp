@@ -1001,7 +1001,6 @@ void MeEncoderOnBoard::encoderMove(void)
  */
 void MeEncoderOnBoard::pwmMove(void)
 {
-#if 0 //payton modify
   if(millis() - _Encoder_move_time > 40)
   {
     _Encoder_move_time = millis();
@@ -1011,21 +1010,6 @@ void MeEncoderOnBoard::pwmMove(void)
       encode_structure.currentPwm = 0;
     }
   }
-#else
-#define ONE_STEP_PWM    20
-  if(encode_structure.targetPwm > encode_structure.currentPwm + ONE_STEP_PWM)
-  {
-    encode_structure.currentPwm += ONE_STEP_PWM;
-  }
-  else if(encode_structure.targetPwm < encode_structure.currentPwm - ONE_STEP_PWM)
-  {
-    encode_structure.currentPwm -= ONE_STEP_PWM;
-  }
-  else
-  {
-    encode_structure.currentPwm = encode_structure.targetPwm;
-  }
-#endif
 }
 
 /**

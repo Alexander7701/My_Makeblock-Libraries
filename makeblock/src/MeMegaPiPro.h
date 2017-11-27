@@ -78,7 +78,6 @@
 #include "MeDCMotor.h"
 #include "MeMegaPiProESCMotor.h"
 #include "MeColorSensor.h"
-#include "MeLightSensorRGB.h"
 
 /*********************  MegaPiPro Board GPIO Map *********************************/
 // struct defined in MegaPiPro.h
